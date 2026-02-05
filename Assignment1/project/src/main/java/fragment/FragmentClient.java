@@ -52,6 +52,19 @@ public class FragmentClient {
     public void insertStudent(String studentId, String name, int age, String email) {
         try {
             // Your code here:
+			int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql =
+                "INSERT INTO Student (student_id, name, age, email) " +
+                "VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT (student_id) DO NOTHING";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ps.setString(2, name);
+            ps.setInt(3, age);
+            ps.setString(4, email);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +76,18 @@ public class FragmentClient {
     public void insertGrade(String studentId, String courseId, int score) {
         try {
             // Your code here
-            
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql =
+                "INSERT INTO Grade (student_id, course_id, score) " +
+                "VALUES (?, ?, ?) " +
+                "ON CONFLICT (student_id, course_id) DO NOTHING";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ps.setString(2, courseId);
+            ps.setInt(3, score);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
