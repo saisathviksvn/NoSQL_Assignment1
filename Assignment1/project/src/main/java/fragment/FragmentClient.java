@@ -86,9 +86,23 @@ public class FragmentClient {
     /**
      * TODO: Fetch the student's name and email.
      */
-    public String getStudentProfile(String studentId) {
+	public String getStudentProfile(String studentId) {
         try {
             // Your code here
+
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql = "SELECT name, email FROM Student WHERE student_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                return name + "," + email;
+            }
+            ps.close();
+            return null;
             
         } catch (Exception e) {
             e.printStackTrace();
