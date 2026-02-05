@@ -40,7 +40,6 @@ public class FragmentClient {
                 System.err.println("FAILED to connect to fragment" + i);
                 e.printStackTrace();
 
-                // 🔥 CRITICAL: stop the program immediately
                 throw new RuntimeException("Cannot start system without all fragments");
             }
         }
