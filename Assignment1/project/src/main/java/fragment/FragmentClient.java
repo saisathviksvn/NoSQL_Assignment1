@@ -52,6 +52,19 @@ public class FragmentClient {
     public void insertStudent(String studentId, String name, int age, String email) {
         try {
             // Your code here:
+			int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql =
+                "INSERT INTO Student (student_id, name, age, email) " +
+                "VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT (student_id) DO NOTHING";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ps.setString(2, name);
+            ps.setInt(3, age);
+            ps.setString(4, email);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +76,18 @@ public class FragmentClient {
     public void insertGrade(String studentId, String courseId, int score) {
         try {
             // Your code here
-            
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql =
+                "INSERT INTO Grade (student_id, course_id, score) " +
+                "VALUES (?, ?, ?) " +
+                "ON CONFLICT (student_id, course_id) DO NOTHING";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ps.setString(2, courseId);
+            ps.setInt(3, score);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,6 +95,15 @@ public class FragmentClient {
     public void updateGrade(String studentId, String courseId, int newScore) {
         try {
 		    // Your code here:
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql = "UPDATE Grade SET score = ? WHERE student_id = ? AND course_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, newScore);
+            ps.setString(2, studentId);
+            ps.setString(3, courseId);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,6 +111,16 @@ public class FragmentClient {
 
     public void deleteStudentFromCourse(String studentId, String courseId) {
         try {
+            // Your code here
+
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql = "DELETE FROM Grade WHERE student_id = ? AND course_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ps.setString(2, courseId);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,9 +129,23 @@ public class FragmentClient {
     /**
      * TODO: Fetch the student's name and email.
      */
-    public String getStudentProfile(String studentId) {
+	public String getStudentProfile(String studentId) {
         try {
             // Your code here
+
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql = "SELECT name, email FROM Student WHERE student_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                return name + "," + email;
+            }
+            ps.close();
+            return null;
             
         } catch (Exception e) {
             e.printStackTrace();
