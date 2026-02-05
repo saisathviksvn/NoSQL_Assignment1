@@ -87,6 +87,16 @@ public class FragmentClient {
 
     public void deleteStudentFromCourse(String studentId, String courseId) {
         try {
+            // Your code here
+
+            int fragmentId = router.getFragmentId(studentId);
+            Connection conn = connectionPool.get(fragmentId);
+            String sql = "DELETE FROM Grade WHERE student_id = ? AND course_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, studentId);
+            ps.setString(2, courseId);
+            ps.executeUpdate();
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
